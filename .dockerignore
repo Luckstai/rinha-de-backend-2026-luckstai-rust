@@ -1,0 +1,6 @@
+.git
+target
+fixtures
+notes
+test
+*.log

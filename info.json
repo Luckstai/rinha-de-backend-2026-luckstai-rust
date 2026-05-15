@@ -1,0 +1,7 @@
+{
+  "participants": ["luckstai"],
+  "social": ["https://github.com/luckstai"],
+  "source-code-repo": "https://github.com/luckstai/rinha-de-backend-2026-luckstai-rust",
+  "stack": ["rust", "actix-web", "haproxy"],
+  "open_to_work": false
+}

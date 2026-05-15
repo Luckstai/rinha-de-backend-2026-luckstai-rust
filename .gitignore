@@ -1,0 +1,24 @@
+.DS_Store
+/target
+/.idea
+/.vscode
+*.log
+*.tmp
+*.swp
+
+# Official fixtures and generated indexes are synced locally, never versioned.
+/fixtures/official/resources/*
+/fixtures/official/test/*
+!/fixtures/official/.gitkeep
+!/fixtures/official/resources/.gitkeep
+!/fixtures/official/test/.gitkeep
+
+# Local benchmark dataset and generated results stay out of the public repo.
+/test/test-data.json
+/test/results*.json
+
+# Local benchmark artifacts
+/resources/references.bin
+/resources/references.bin.*
+/resources/references.json
+/resources/references.json.gz
