@@ -16,55 +16,52 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "${LB_CPUS:-0.15}"
-          memory: "${LB_MEMORY:-32MB}"
+          cpus: "0.15"
+          memory: "32MB"
 
   api1:
     build:
       context: .
       dockerfile: Dockerfile
-    image: luckstai/rinha-2026-api:dev
+    image: luckstai/rinha-2026-api:submission
     container_name: rinha-api-1
     environment:
-      RINHA_ALGORITHM: ${RINHA_ALGORITHM:-ivf}
+      RINHA_ALGORITHM: ivf
       BIND_ADDR: 0.0.0.0:9999
-      APP_WORKERS: ${APP_WORKERS:-1}
-      RINHA_NORMALIZATION_PATH: /app/fixtures/resources/normalization.json
-      RINHA_MCC_RISK_PATH: /app/fixtures/resources/mcc_risk.json
-      RINHA_INDEX_PATH: /app/fixtures/resources/references.idx
-      RINHA_IVF_INDEX_PATH: ${RINHA_IVF_INDEX_PATH:-/app/fixtures/resources/references.n2048.s65536.i8.ivf}
-      RINHA_IVF_NPROBE: ${RINHA_IVF_NPROBE:-8}
-    volumes:
-      - ./fixtures/official:/app/fixtures:ro
+      APP_WORKERS: "1"
+      RINHA_NORMALIZATION_PATH: /app/resources/normalization.json
+      RINHA_MCC_RISK_PATH: /app/resources/mcc_risk.json
+      RINHA_IVF_INDEX_PATH: /app/resources/references.n2048.s65536.i8.ivf
+      RINHA_IVF_NPROBE: "8"
     networks:
       - rinha-net
     deploy:
       resources:
         limits:
-          cpus: "${API_CPUS:-0.425}"
-          memory: "${API_MEMORY:-159MB}"
+          cpus: "0.425"
+          memory: "159MB"
 
   api2:
-    image: luckstai/rinha-2026-api:dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: luckstai/rinha-2026-api:submission
     container_name: rinha-api-2
     environment:
-      RINHA_ALGORITHM: ${RINHA_ALGORITHM:-ivf}
+      RINHA_ALGORITHM: ivf
       BIND_ADDR: 0.0.0.0:9999
-      APP_WORKERS: ${APP_WORKERS:-1}
-      RINHA_NORMALIZATION_PATH: /app/fixtures/resources/normalization.json
-      RINHA_MCC_RISK_PATH: /app/fixtures/resources/mcc_risk.json
-      RINHA_INDEX_PATH: /app/fixtures/resources/references.idx
-      RINHA_IVF_INDEX_PATH: ${RINHA_IVF_INDEX_PATH:-/app/fixtures/resources/references.n2048.s65536.i8.ivf}
-      RINHA_IVF_NPROBE: ${RINHA_IVF_NPROBE:-8}
-    volumes:
-      - ./fixtures/official:/app/fixtures:ro
+      APP_WORKERS: "1"
+      RINHA_NORMALIZATION_PATH: /app/resources/normalization.json
+      RINHA_MCC_RISK_PATH: /app/resources/mcc_risk.json
+      RINHA_IVF_INDEX_PATH: /app/resources/references.n2048.s65536.i8.ivf
+      RINHA_IVF_NPROBE: "8"
     networks:
       - rinha-net
     deploy:
       resources:
         limits:
-          cpus: "${API_CPUS:-0.425}"
-          memory: "${API_MEMORY:-159MB}"
+          cpus: "0.425"
+          memory: "159MB"
 
 networks:
   rinha-net:
