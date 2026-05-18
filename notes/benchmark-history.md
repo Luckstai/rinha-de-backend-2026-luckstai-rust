@@ -380,6 +380,92 @@ Leitura:
 - ainda assim confirmou melhora clara sobre todos os candidatos anteriores ao `nprobe=8`
 - a variacao entre `39.86 ms` e `44.09 ms` de `p99` parece ruido operacional normal do ambiente local
 
+## Campanha de 2026-05-18
+
+Objetivo:
+
+- revalidar a variancia do baseline atual no host
+- testar um sweep pequeno de `nprobe` acima de `8`
+- validar se `workers=2` ou uma pequena realocacao de CPU ajudariam o melhor candidato
+
+Baseline repetido com a configuracao atual (`ivf`, `nprobe=8`, `LB=0.15`, `API=0.425`, `workers=1`):
+
+| Run | final_score | p99 | fp | fn | http_errors | Arquivo |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| 1 | 5173.81 | 2.73 ms | 7 | 4 | 0 | `test/results.baseline.ivf.nprobe8.lb015.api0425.w1.run1.json` |
+| 2 | 4702.18 | 8.08 ms | 7 | 4 | 0 | `test/results.baseline.ivf.nprobe8.lb015.api0425.w1.run2.json` |
+| 3 | 4683.49 | 8.44 ms | 7 | 4 | 0 | `test/results.baseline.ivf.nprobe8.lb015.api0425.w1.run3.json` |
+
+Sweep de `nprobe` no mesmo indice `references.n2048.s65536.i8.ivf`:
+
+| `nprobe` | final_score | p99 | fp | fn | http_errors | Arquivo |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| 9 | 3929.73 | 49.40 ms | 5 | 4 | 0 | `test/results.ivf.nprobe9.may18.json` |
+| 10 | 4207.99 | 27.49 ms | 5 | 3 | 0 | `test/results.ivf.nprobe10.may18.json` |
+| 12 | 4988.85 | 4.31 ms | 5 | 4 | 0 | `test/results.ivf.nprobe12.may18.json` |
+
+Rerodada do melhor candidato (`nprobe=12`):
+
+| Run | final_score | p99 | fp | fn | http_errors | Arquivo |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| 1 | 5059.84 | 3.66 ms | 5 | 4 | 0 | `test/results.ivf.nprobe12.lb015.api0425.w1.run1.json` |
+| 2 | 4818.25 | 6.39 ms | 5 | 4 | 0 | `test/results.ivf.nprobe12.lb015.api0425.w1.run2.json` |
+
+Variantes de runtime/CPU em cima do `nprobe=12`:
+
+| Variante | final_score | p99 | fp | fn | http_errors | Arquivo |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| `workers=2`, `LB=0.15`, `API=0.425` | 3787.62 | 68.52 ms | 5 | 4 | 0 | `test/results.ivf.nprobe12.lb015.api0425.w2.may18.json` |
+| `workers=1`, `LB=0.125`, `API=0.4375` | 2806.81 | 655.56 ms | 5 | 4 | 0 | `test/results.ivf.nprobe12.lb0125.api04375.w1.may18.json` |
+
+Leitura:
+
+- o host local ficou claramente mais favoravel do que nas rodadas registradas em `2026-05-13`, com `p99` muito menor e score final bem mais alto
+- `nprobe=9` e `nprobe=10` melhoraram um pouco a deteccao, mas perderam feio em `p99`
+- `nprobe=12` foi o primeiro ponto acima de `8` que melhorou score final sem sacrificar latencia
+- `workers=2` continua ruim para esse orcamento
+- reduzir o LB para `0.125 CPU` foi insuficiente; houve saturacao de VUs e `p99` desabou
+
+Decisao:
+
+- promover `nprobe=12` como melhor candidato atual no host local
+- manter `APP_WORKERS=1`
+- manter `LB_CPUS=0.15` e `API_CPUS=0.425`
+- tratar os numeros de `2026-05-18` como nova referencia local ate prova em contrario
+- se houver novo ciclo de tuning, partir deste baseline antes de explorar bibliotecas externas
+
+## Validacao limpa de 2026-05-18 com default promovido
+
+Objetivo:
+
+- promover `RINHA_IVF_NPROBE=12` como default do projeto
+- validar a stack sem overrides especificos de algoritmo
+- confirmar que o candidato segue saudavel como versao de submissao
+
+Mudancas:
+
+- `src/config.rs`: default de `ivf_nprobe` promovido de `8` para `12`
+- `docker-compose.yml`: default de `RINHA_IVF_NPROBE` promovido de `8` para `12`
+
+Resultados:
+
+| Teste | Resultado | Arquivo |
+| --- | --- | --- |
+| Smoke | 5/5 iteracoes, `http_req_failed=0`, `avg=1.65 ms`, `p95=2.66 ms` | `test/smoke.js` |
+| Previa oficial local | `final_score=4673.75`, `p99=8.91 ms`, `fp=5`, `fn=4`, `http_errors=0` | `test/results.validate.clean.default-nprobe12.2026-05-18.json` |
+| `cargo test` em container | 5 testes passando, 0 falhas | `scripts/test_in_docker.sh` |
+
+Leitura:
+
+- a promocao do default preservou o perfil de erro forte do `nprobe=12`
+- esta rodada ficou abaixo dos melhores picos observados no mesmo dia, mas ainda bem acima das validacoes antigas do baseline com `nprobe=8`
+- o comportamento permaneceu compativel com submissao: sem erros HTTP, com smoke limpo e testes Rust passando
+
+Decisao:
+
+- manter `nprobe=12` como default do projeto
+- usar esta validacao limpa como referencia operacional para preparar a submissao
+
 ## Melhor configuracao atual
 
 Usar:
@@ -390,14 +476,15 @@ API_CPUS=0.425
 APP_WORKERS=1
 RINHA_ALGORITHM=ivf
 RINHA_IVF_INDEX_PATH=/app/fixtures/resources/references.n2048.s65536.i8.ivf
-RINHA_IVF_NPROBE=8
+RINHA_IVF_NPROBE=12
 ```
 
 Arquivos de referencia:
 
-- melhor score observado: `test/results.references.n2048.s65536.i8.revertcheck2.nprobe8.json`
-- melhor score anterior relevante: `test/results.references.n2048.s65536.i8.nprobe8.json`
-- ultima validacao completa: `test/results.references.n2048.s65536.i8.revertcheck2.nprobe8.json`
+- melhor score observado: `test/results.baseline.ivf.nprobe8.lb015.api0425.w1.run1.json`
+- melhor candidato atual: `test/results.ivf.nprobe12.lb015.api0425.w1.run1.json`
+- rerodada confirmatoria do candidato atual: `test/results.ivf.nprobe12.lb015.api0425.w1.run2.json`
+- validacao limpa com default promovido: `test/results.validate.clean.default-nprobe12.2026-05-18.json`
 - ultima calibracao limpa: `test/results.verify.calibrate.lb250.revertcheck.json`
 
 ## Proximos passos

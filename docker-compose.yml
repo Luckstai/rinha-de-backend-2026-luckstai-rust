@@ -33,7 +33,7 @@ services:
       RINHA_MCC_RISK_PATH: /app/fixtures/resources/mcc_risk.json
       RINHA_INDEX_PATH: /app/fixtures/resources/references.idx
       RINHA_IVF_INDEX_PATH: ${RINHA_IVF_INDEX_PATH:-/app/fixtures/resources/references.n2048.s65536.i8.ivf}
-      RINHA_IVF_NPROBE: ${RINHA_IVF_NPROBE:-8}
+      RINHA_IVF_NPROBE: ${RINHA_IVF_NPROBE:-12}
     volumes:
       - ./fixtures/official:/app/fixtures:ro
     networks:
@@ -55,7 +55,7 @@ services:
       RINHA_MCC_RISK_PATH: /app/fixtures/resources/mcc_risk.json
       RINHA_INDEX_PATH: /app/fixtures/resources/references.idx
       RINHA_IVF_INDEX_PATH: ${RINHA_IVF_INDEX_PATH:-/app/fixtures/resources/references.n2048.s65536.i8.ivf}
-      RINHA_IVF_NPROBE: ${RINHA_IVF_NPROBE:-8}
+      RINHA_IVF_NPROBE: ${RINHA_IVF_NPROBE:-12}
     volumes:
       - ./fixtures/official:/app/fixtures:ro
     networks:

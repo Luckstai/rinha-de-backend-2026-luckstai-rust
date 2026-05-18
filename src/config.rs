@@ -39,7 +39,7 @@ impl AppConfig {
                 .ok()
                 .and_then(|value| value.parse::<usize>().ok())
                 .filter(|value| *value > 0)
-                .unwrap_or(8),
+                .unwrap_or(12),
             ivf_gate_margin: env::var("RINHA_IVF_GATE_MARGIN")
                 .ok()
                 .and_then(|value| value.parse::<f64>().ok())
