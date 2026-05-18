@@ -21,10 +21,7 @@ services:
           memory: "32MB"
 
   api1:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: luckstai/rinha-2026-api:submission
+    image: luckstai/rinha-de-backend-2026-rust:submission-nprobe12-20260518
     platform: linux/amd64
     container_name: rinha-api-1
     environment:
@@ -44,10 +41,7 @@ services:
           memory: "159MB"
 
   api2:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: luckstai/rinha-2026-api:submission
+    image: luckstai/rinha-de-backend-2026-rust:submission-nprobe12-20260518
     platform: linux/amd64
     container_name: rinha-api-2
     environment:
