@@ -1,6 +1,7 @@
 services:
   lb:
     image: haproxy:3.0-alpine
+    platform: linux/amd64
     container_name: rinha-lb
     ports:
       - "9999:9999"
@@ -24,6 +25,7 @@ services:
       context: .
       dockerfile: Dockerfile
     image: luckstai/rinha-2026-api:submission
+    platform: linux/amd64
     container_name: rinha-api-1
     environment:
       RINHA_ALGORITHM: ivf
@@ -32,7 +34,7 @@ services:
       RINHA_NORMALIZATION_PATH: /app/resources/normalization.json
       RINHA_MCC_RISK_PATH: /app/resources/mcc_risk.json
       RINHA_IVF_INDEX_PATH: /app/resources/references.n2048.s65536.i8.ivf
-      RINHA_IVF_NPROBE: "8"
+      RINHA_IVF_NPROBE: "12"
     networks:
       - rinha-net
     deploy:
@@ -46,6 +48,7 @@ services:
       context: .
       dockerfile: Dockerfile
     image: luckstai/rinha-2026-api:submission
+    platform: linux/amd64
     container_name: rinha-api-2
     environment:
       RINHA_ALGORITHM: ivf
@@ -54,7 +57,7 @@ services:
       RINHA_NORMALIZATION_PATH: /app/resources/normalization.json
       RINHA_MCC_RISK_PATH: /app/resources/mcc_risk.json
       RINHA_IVF_INDEX_PATH: /app/resources/references.n2048.s65536.i8.ivf
-      RINHA_IVF_NPROBE: "8"
+      RINHA_IVF_NPROBE: "12"
     networks:
       - rinha-net
     deploy:
